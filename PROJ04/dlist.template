@@ -1,0 +1,266 @@
+//**********************************//
+//  GAVIN DASSATTI                  //
+//  CS 2401                         //
+//  PROJECT 04                      //
+//                                  //
+//  THIS FILE IS THE TEMPLATE       //
+//  IMPLEMATION FOR THE DLIST       //
+//  CLASS.                          //
+//**********************************//
+
+#include <iostream>
+using namespace std;
+
+// DEFAULT CONSTRUCTOR
+template<class G>
+dlist<G>::dlist(){
+
+    head = NULL;
+    tail = NULL;
+
+}
+
+// DECONSTRUCTOR
+template<class G>
+dlist<G>::~dlist(){
+
+    clear_List();
+
+}
+
+// COPY CONSTRUCTOR
+template<class G>
+dlist<G>::dlist(const dlist& other){
+
+    head = tail = NULL;
+    if(other.head == NULL){ return; }
+    dnode<G>* cursor = other.head;
+    while(cursor != NULL){
+
+        rear_insert(cursor -> data());
+        cursor = cursor -> next();
+
+    }
+
+}
+
+// ASSIGNMENT OPERATOR
+template<class G>
+dlist<G>& dlist<G>::operator =(const dlist& other){
+
+    if(this == &other){
+
+        return *this;
+
+    }
+
+    clear_List();
+    const dnode<G>* cursor = other.head;
+    while(cursor != NULL){
+
+        rear_insert(cursor -> data());
+        cursor = cursor -> next();
+
+    }
+
+    return *this;
+
+}
+
+// INSERTS AN ITEM AT THE BEGINNING OF THE LIST
+template<class G>
+void dlist<G>::front_insert(const G& item){
+
+    if(head == NULL){
+
+        head = tail = new dnode<G>(item);
+
+    } else {
+
+        head -> set_previous(new dnode<G>(item, NULL, head));
+        head = head -> previous();
+
+    }
+
+}
+
+// INSERTS AN ITEM AT THE END OF THE LIST
+template<class G>
+void dlist<G>::rear_insert(const G& item){
+
+    if(head == NULL){
+
+        head = tail = new dnode<G>(item);
+        return;
+
+    } else {
+
+        tail -> set_next(new dnode<G>(item, tail, NULL));
+        tail = tail -> next();
+
+    }
+
+}
+
+// REMOVES THE FIRST ITEM IN THE LIST
+template<class G>
+void dlist<G>::front_remove(){
+
+    if(head == NULL){ return; }
+    if(head == tail){
+
+        tail = NULL;
+        delete head;
+        head = NULL;
+        return;
+
+    }
+
+    dnode<G>* remove_ptr = head;
+    head = head -> next();
+    head -> set_previous(NULL);
+    delete remove_ptr;
+
+}
+
+// REMOVES THE LAST ITEM IN THE LIST
+template<class G>
+void dlist<G>::rear_remove(){
+
+    if(head == NULL){ return; }
+    if(head == tail){
+
+        tail = NULL;
+        delete head;
+        head = NULL;
+        return;
+
+    }
+
+    dnode<G>* remove_ptr = tail;
+    tail = tail -> previous();
+    tail -> set_next(NULL);
+    delete remove_ptr;
+
+}
+
+// REMOVES EVERY ELEMENT IN THE LIST
+template<class G>
+void dlist<G>::clear_List(){
+
+    if(head == NULL){ return; }
+    dnode<G>* remove_ptr;
+    while(head != NULL){
+
+        remove_ptr = head;
+        head = head -> next();
+        if(head != NULL){
+
+            head -> set_previous(NULL);
+
+        }
+
+        delete remove_ptr;
+
+    }
+
+    tail = NULL;
+
+}
+
+// DISPLAYS EVERY ELEMENT IN THE LIST
+template<class G>
+void dlist<G>::show(){
+
+    dnode<G>* cursor = head;
+    while(cursor != NULL){
+
+        cout << cursor -> data() << endl;
+        cursor = cursor -> next();
+
+    }
+
+}
+
+// DISPLAYS EVERY ELEMENT IN THE LIST IN REVERSE
+template<class G>
+void dlist<G>::reverse_show(){
+
+    dnode<G>* cursor = tail;
+    while(tail != NULL){
+
+        cout << cursor -> data() << endl;
+        cursor = cursor -> previous();
+
+    }
+
+}
+
+// RETURNS THE NUMBER OF ELEMENTS IN THE LIST
+template<class G>
+int dlist<G>::size(){
+
+    int count = 0;
+    dnode<G>* cursor = head;
+    while(cursor != NULL){
+
+        ++count;
+        cursor = cursor -> next();
+
+    }
+
+    return count;
+
+}
+
+// INSERTS AN ITEM BEFORE THE LOCATION SPECIFIED BY THE ITERATOR
+template<class G>
+void dlist<G>::insert_before(iterator index, G item){
+
+    dnode<G>* cursor = index.current;
+    dnode<G>* before_cursor = cursor -> previous();
+
+    if(before_cursor == NULL){
+
+        front_insert(item);
+        return;
+
+    }
+
+    before_cursor -> set_next(new dnode<G>(item, before_cursor, cursor));
+    cursor -> set_previous(before_cursor -> next());
+
+}
+
+// INSERTS AN ITEM AFTER THE LOCATION SPECIFIED BY THE ITERATOR
+template<class G>
+void dlist<G>::insert_after(iterator index, G item){
+
+    dnode<G>* cursor = index.current;
+    dnode<G>* after_cursor = cursor -> next();
+
+    if(after_cursor == NULL){
+
+        rear_insert(item);
+        return;
+
+    }
+
+    cursor -> set_next(new dnode<G>(item, cursor, after_cursor));
+    after_cursor -> set_previous(cursor -> next());
+
+}
+
+// REMOVES THE ELEMENT AT THE LOCATION SPECIFIED BY THE ITERATOR
+void dlist<G>::remove(iterator index){
+
+    dnode<G>* remove_ptr = index.current;
+    dnode<G>* before_cursor = remove_ptr -> previous();
+    dnode<G>* after cursor = remove_ptr -> next();
+
+    before_cursor -> set_next(after_cursor);
+    after_cursor -> set_previous(before_cursor);
+
+    delete remove_ptr;
+
+}
